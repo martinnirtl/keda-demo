@@ -1,3 +1,13 @@
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: dynatrace-keda-auth
+spec:
+  secretTargetRef:
+  - parameter: apiKey
+    name: dynatrace-keda-secret
+    key: token
+
 ---
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
@@ -17,6 +27,10 @@ spec:
     - type: metrics-api
       metadata:
         targetValue: "100"
-        # Replace tenant base-url and token (read metrics permission)
-        url: '<tenant-baseurl>/api/v2/metrics/query?metricSelector=builtin:service.requestCount.total:filter(and(in("dt.entity.service",entitySelector("type(service),entityName(~"greeting-service~")")))):splitBy():sum:timeshift(-3m):rollup(avg,3m):last&Api-Token=<token>'
+        # TODO Replace <tenant-baseurl>
+        url: 'https://ztn45169.sprint.dynatracelabs.com/api/v2/metrics/query?metricSelector=builtin:service.requestCount.total:filter(and(in("dt.entity.service",entitySelector("type(service),entityName(~"greeting-service~")")))):splitBy():sum:timeshift(-3m):rollup(avg,3m):last'
         valueLocation: 'result.0.data.0.values.0'
+        authMode: apiKey
+        keyParamName: Authorization
+      authenticationRef:
+        name: dynatrace-keda-auth 
