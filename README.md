@@ -9,7 +9,23 @@ Prerequisits
 - [KEDA](https://keda.sh/docs/2.5/deploy/) installed in your cluster
 - [k6](https://k6.io/docs/getting-started/installation/) on your machine or container
 
-The Kubernetes deployment files are placed in _deployment/kubernetes_. Before applying the files, please update _keda.yaml_ (marked with TODO) with your **environment/tenant url** and create a secret by running the following command (replace token w/ _read metrics_ permission):
+The Kubernetes deployment files are placed in _deployment/kubernetes_. Before applying the files, please update the following line in _keda.yaml_ (marked with TODO) by adding your **environment/tenant url**:
+
+```yaml
+triggers:
+  - type: metrics-api
+    metadata:
+      targetValue: '100'
+      # TODO Replace <tenant-baseurl>
+      url: '<tenant-baseurl>/api/v2/metrics/query?metricSelector=builtin:service.requestCount.total:filter(and(in("dt.entity.service",entitySelector("type(service),entityName(~"greeting-service~")")))):splitBy():sum:timeshift(-3m):rollup(avg,3m):last'
+      valueLocation: 'result.0.data.0.values.0'
+      authMode: apiKey
+      keyParamName: Authorization
+    authenticationRef:
+      name: dynatrace-keda-auth
+```
+
+Also, generate an API token with **read metrics (v2)** permission in Dynatrace and create a secret by running the following command (replace <token>):
 
 ```bash
 kubectl create secret generic dynatrace-keda-secret --from-literal token="Api-Token <token>"
