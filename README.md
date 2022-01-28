@@ -6,6 +6,7 @@ This is a demo project showcasing Dynatrace and KEDA for horizontal pod autoscal
 
 Prerequisits
 
+- Kubernetes cluster
 - [KEDA](https://keda.sh/docs/2.5/deploy/) installed in your cluster
 - [k6](https://k6.io/docs/getting-started/installation/) on your machine or container
 
