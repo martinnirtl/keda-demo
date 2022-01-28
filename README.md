@@ -8,7 +8,6 @@ Prerequisits
 
 - Kubernetes cluster
 - [KEDA](https://keda.sh/docs/2.5/deploy/) installed in your cluster
-- [k6](https://k6.io/docs/getting-started/installation/) on your machine or container
 
 The Kubernetes deployment files are placed in _deployment/kubernetes_. Before applying the files, please update the following line in _keda.yaml_ (marked with TODO) by adding your **environment/tenant url**:
 
