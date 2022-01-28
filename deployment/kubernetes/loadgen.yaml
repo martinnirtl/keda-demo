@@ -4,7 +4,7 @@ kind: ConfigMap
 metadata:
   name: loadtest-config
 data:
-  script.ts: |
+  script.js: |
     import http from 'k6/http';
     import { sleep } from 'k6';
 
@@ -32,7 +32,7 @@ spec:
             - run
             - "--vus=10"
             - "--duration=1m"
-            - script.ts
+            - script.js
             env:
             - name: GREETING_SERVICE_BASEURL
               value: http://greeting-service:4000
