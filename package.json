@@ -1,0 +1,28 @@
+{
+  "name": "greeting-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon -r dotenv/config src/index.js",
+    "docker:build": "docker build -t martinnirtl/demos.general.greeting-service:latest .",
+    "docker:push": "docker push martinnirtl/demos.general.greeting-service:latest",
+    "k6:simple": "k6 run -e GREETING_SERVICE_BASEURL=https://greeting-service.demos.dynatrace.martinnirtl.com test/load/greet-martins.ts",
+    "k6:load": "k6 run --vus 10 --duration 30s -e GREETING_SERVICE_BASEURL=https://greeting-service.demos.dynatrace.martinnirtl.com test/load/greet-martins.ts"
+    
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "dotenv": "^14.3.2",
+    "eslint": "^8.7.0",
+    "nodemon": "^2.0.15",
+    "pino-pretty": "^7.5.0"
+  },
+  "dependencies": {
+    "async-exit-hook": "^2.0.1",
+    "express": "^4.17.2",
+    "pino-http": "^6.6.0"
+  }
+}

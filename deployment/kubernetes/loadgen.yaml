@@ -1,0 +1,46 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loadtest-config
+data:
+  script.ts: |
+    import http from 'k6/http';
+    import { sleep } from 'k6';
+
+    export default function () {
+      http.get(__ENV.GREETING_SERVICE_BASEURL + '/hello/martin');
+      sleep(1);
+    }
+
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: loadtest
+spec:
+  schedule: "* * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: k6
+            image: loadimpact/k6
+            imagePullPolicy: IfNotPresent
+            args:
+            - run
+            - "--vus=10"
+            - "--duration=1m"
+            - script.ts
+            env:
+            - name: GREETING_SERVICE_BASEURL
+              value: http://greeting-service:4000
+            volumeMounts:
+              - mountPath: /home/k6
+                name: config
+          restartPolicy: OnFailure
+          volumes:
+            - name: config
+              configMap:
+                name: loadtest-config

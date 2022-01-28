@@ -1,0 +1,21 @@
+version: "2"
+
+services:
+  greeting-service:
+    image: martinnirtl/demos.general.greeting-service:0.1.0
+    environment:
+      - SERVICE_NAME=greeting-service
+      - PORT=4000
+      - RESPONSETIME=0
+      - FAILURERATEAPS=48
+
+  k6:
+    image: loadimpact/k6
+    # command: ["run", "scripts/greet-martins.ts"]
+    command: ["run", "--vus=10", "--duration=20s","scripts/greet-martins.ts"]
+    environment:
+      - GREETING_SERVICE_BASEURL=http://greeting-service:4000
+    volumes:
+      - "./test/load/:/home/k6/scripts"
+
+

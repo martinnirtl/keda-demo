@@ -1,0 +1,22 @@
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: greeting-service
+  labels:
+    app: greeting-service
+spec:
+  minReplicaCount: 2
+  maxReplicaCount: 14
+  fallback:
+    failureThreshold: 3
+    replicas: 6
+  scaleTargetRef:
+    name: greeting-service
+  triggers:
+    - type: metrics-api
+      metadata:
+        targetValue: "100"
+        # Replace tenant base-url and token (read metrics permission)
+        url: '<tenant-baseurl>/api/v2/metrics/query?metricSelector=builtin:service.requestCount.total:filter(and(in("dt.entity.service",entitySelector("type(service),entityName(~"greeting-service~")")))):splitBy():sum:timeshift(-3m):rollup(avg,3m):last&Api-Token=<token>'
+        valueLocation: 'result.0.data.0.values.0'

@@ -1,0 +1,57 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: greeting-service-config
+data:
+  PORT: '4000'
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: greeting-service
+  labels:
+    app: greeting-service
+spec:
+  selector:
+    app: greeting-service
+  ports:
+    - name: http
+      port: 4000
+      targetPort: http
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: greeting-service
+    app.kubernetes.io/name: greeting-service
+    app.kubernetes.io/version: latest
+    app.kubernetes.io/component: service
+    app.kubernetes.io/part-of: general
+    app.kubernetes.io/managed-by: manifests
+    app.kubernetes.io/created-by: admin
+  name: greeting-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: greeting-service
+  template:
+    metadata:
+      labels:
+        app: greeting-service
+    spec:
+      containers:
+        - name: greeting-service
+          image: martinnirtl/demos.general.greeting-service:latest
+          resources: {}
+          envFrom:
+            - configMapRef:
+                name: greeting-service-config
+          ports:
+            - name: http
+              containerPort: 4000
+              protocol: TCP
