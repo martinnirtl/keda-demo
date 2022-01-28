@@ -25,7 +25,7 @@ triggers:
       name: dynatrace-keda-auth
 ```
 
-Also, generate an API token with **read metrics (v2)** permission in Dynatrace and create a secret by running the following command (replace <token>):
+Also, generate an API token with **read metrics (v2)** permission in Dynatrace and create a secret by running the following command with the just created token:
 
 ```bash
 kubectl create secret generic dynatrace-keda-secret --from-literal token="Api-Token <token>"
