@@ -62,7 +62,7 @@ spec:
             imagePullPolicy: IfNotPresent
             args:
             - run
-            - "--vus=40"
+            - "--vus=10"
             - "--duration=2m"
             - script.js
             env:
