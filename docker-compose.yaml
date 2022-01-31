@@ -2,20 +2,57 @@ version: "2"
 
 services:
   greeting-service:
-    image: martinnirtl/demos.general.greeting-service:0.1.0
+    image: martinnirtl/demos.general.greeting-service:local
+    command: ["-r", "./src/tracing.js", "src/index.js"]
     environment:
       - SERVICE_NAME=greeting-service
       - PORT=4000
-      - RESPONSETIME=0
-      - FAILURERATEAPS=48
+      - RESPONSE_TIME=400
+      - FAILURE_RATE=4
+      - MEMORY_LEAK=disabled
+      - OTEL_ENDPOINT_URL=grpc://otel-collector:4317
+    ports:
+      - "4000:4000"
 
   k6:
     image: loadimpact/k6
     # command: ["run", "scripts/greet-martins.ts"]
-    command: ["run", "--vus=10", "--duration=20s","scripts/greet-martins.ts"]
+    command: ["run", "--vus=10", "--duration=10m","scripts/greet-martins.js"]
     environment:
       - GREETING_SERVICE_BASEURL=http://greeting-service:4000
     volumes:
-      - "./test/load/:/home/k6/scripts"
+      - "./test/k6/:/home/k6/scripts"
 
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    ports:
+      - "8888:8888" # Prometheus metrics exposed by the collector
+      - "8889:8889"   # Prometheus exporter metrics
+      - "4317:4317" # OTLP gRPC receiver
+    volumes:
+      - ./monitoring/otel-collector-config.yaml:/etc/otel-collector-config.yaml
 
+  prometheus:
+    image: prom/prometheus:v2.32.1
+    ports:
+      - 9090:9090
+    volumes:
+      - ./monitoring/prometheus.yaml:/etc/prometheus/prometheus.yml
+
+  tempo:
+    image: grafana/tempo:latest
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./monitoring/tempo.yaml:/etc/tempo.yaml
+
+  grafana:
+    image: grafana/grafana-oss:8.3.4
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./monitoring/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
