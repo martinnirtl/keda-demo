@@ -46,7 +46,7 @@ spec:
     spec:
       containers:
         - name: greeting-service
-          image: martinnirtl/demos.general.greeting-service:latest
+          image: martinnirtl/demos.general.greeting-service:0.2.0-alpha
           resources: {}
           envFrom:
             - configMapRef:
