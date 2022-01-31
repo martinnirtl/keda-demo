@@ -2,49 +2,24 @@ const express = require('express');
 const exitHook = require('async-exit-hook');
 
 const logging = require('./logging');
+const metrics = require('./metrics');
+const { useProblem } = require('./problems');
 
 const config = {
-  responseTime: parseInt(process.env.CONFIG_RESPONSETIME) || 140,
-  failureRateAbsolut: parseInt(process.env.CONFIG_FAILURERATEABS) || 48,
-  simulateMemoryLeak: false,
+  responseTime: parseInt(process.env.RESPONSE_TIME) || 140,
+  failureRate: parseInt(process.env.FAILURE_RATE) || 0,
+  memoryLeak: process.env.MEMORY_LEAK === 'enabled' || false,
 };
 
-const state = {
-  requestCounter: 0,
-  calculations: [],
-};
-
-const blockCpuFor = ms => {
-  const now = new Date().getTime();
-  const v = Math.random() * 10;
-
-  const calculations = config.simulateMemoryLeak ? state.calculations : [];
-  for (;;) {
-    calculations.push(Math.random() * Math.random());
-
-    if (new Date().getTime() > now + ms + v) {
-      return;
-    }
-  }
-};
-
-const throwError = () => {
-  if (state.requestCounter > 100) {
-    state.requestCounter = 0;
-  }
-
-  if (++state.requestCounter % config.failureRateAbsolut === 0) {
-    return true;
-  }
-
-  return false;
-};
+const problem = useProblem(config.responseTime, config.failureRate, config.memoryLeak);
 
 const main = async () => {
   const app = express();
   app.disable('x-powered-by');
   app.use(express.json());
   app.use(logging);
+
+  app.get('/metrics', metrics);
 
   app.get('/hello/:name', (req, res) => {
     const name = req.params.name;
@@ -53,9 +28,9 @@ const main = async () => {
       return res.status(400).send();
     }
 
-    blockCpuFor(config.responseTime);
-    if (throwError()) {
-      blockCpuFor(40);
+    try {
+      problem.do();
+    } catch (error) {
       return res.status(500).send();
     }
 
