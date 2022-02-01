@@ -1,9 +1,11 @@
 FROM node:16 AS build-env
 
 WORKDIR /app
-COPY . ./
 
+COPY package*.json ./
 RUN npm ci --only=production
+
+COPY . ./
 
 FROM gcr.io/distroless/nodejs:16
 
