@@ -20,11 +20,11 @@ metadata:
     metrics.dynatrace.com/path: 'metrics'
     metrics.dynatrace.com/port: '4000'
     metrics.dynatrace.com/secure: 'false'
-    # metrics.dynatrace.com/filter: |
-    #   {
-    #     "mode": "include",
-    #     "names": [ "app_request_count_total" ]
-    #   }
+    metrics.dynatrace.com/filter: |
+      {
+        "mode": "include",
+        "names": [ "app_request_count_total" ]
+      }
 spec:
   selector:
     app: greeting-service
