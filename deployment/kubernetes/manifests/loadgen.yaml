@@ -49,9 +49,9 @@ spec:
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: loadtest-burst
+  name: loadtest-hourly-burst
 spec:
-  schedule: "20 * * * *"
+  schedule: "0 */2 * * *"
   jobTemplate:
     spec:
       template:
@@ -64,6 +64,38 @@ spec:
             - run
             - "--vus=10"
             - "--duration=2m"
+            - script.js
+            env:
+            - name: GREETING_SERVICE_BASEURL
+              value: http://greeting-service:4000
+            volumeMounts:
+              - mountPath: /home/k6
+                name: config
+          restartPolicy: OnFailure
+          volumes:
+            - name: config
+              configMap:
+                name: loadtest-config
+
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: loadtest-daily-burst
+spec:
+  schedule: "* 6 * * 1-5"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: k6
+            image: loadimpact/k6
+            imagePullPolicy: IfNotPresent
+            args:
+            - run
+            - "--vus=40"
+            - "--duration=10m"
             - script.js
             env:
             - name: GREETING_SERVICE_BASEURL
