@@ -1,4 +1,4 @@
-class Problem {
+class ResourcesConsumer {
   responseTime;
   failureRate;
   memoryLeak;
@@ -51,7 +51,7 @@ class Problem {
     }
   }
 
-  do(computingTime = this.responseTime, errorOverhead = 0) {
+  consume(computingTime = this.responseTime, errorOverhead = 0) {
     this.blockCPU(computingTime + errorOverhead);
 
     const throwError = this.failureRateHelper[this.requestCounter];
@@ -67,4 +67,6 @@ class Problem {
   }
 }
 
-exports.useProblem = (responseTime, failureRate, memoryLeak) => new Problem(responseTime, failureRate, memoryLeak);
+exports.consumeResources = (responseTime, failureRate, memoryLeak) => {
+  return new ResourcesConsumer(responseTime, failureRate, memoryLeak);
+};

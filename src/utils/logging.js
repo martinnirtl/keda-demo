@@ -1,5 +1,4 @@
 const pino = require('pino-http')({
-  name: process.env.SERVICE_NAME,
   base: undefined,
   messageKey: 'content',
   formatters: {
@@ -11,4 +10,7 @@ const pino = require('pino-http')({
   quietReqLogger: true,
 });
 
-module.exports = pino;
+module.exports = {
+  middleware: pino,
+  logger: pino.logger,
+};
