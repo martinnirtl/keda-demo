@@ -15,6 +15,16 @@ metadata:
   name: greeting-service
   labels:
     app: greeting-service
+  annotations:
+    metrics.dynatrace.com/scrape: 'true'
+    metrics.dynatrace.com/path: 'metrics'
+    metrics.dynatrace.com/port: '4000'
+    metrics.dynatrace.com/secure: 'false'
+    # metrics.dynatrace.com/filter: |
+    #   {
+    #     "mode": "include",
+    #     "names": [ "app_request_count_total" ]
+    #   }
 spec:
   selector:
     app: greeting-service
@@ -30,9 +40,9 @@ metadata:
   labels:
     app: greeting-service
     app.kubernetes.io/name: greeting-service
-    app.kubernetes.io/version: latest
+    app.kubernetes.io/version: 0.4.0
     app.kubernetes.io/component: service
-    app.kubernetes.io/part-of: general
+    app.kubernetes.io/part-of: keda-demo
     app.kubernetes.io/managed-by: manifests
     app.kubernetes.io/created-by: admin
   name: greeting-service
