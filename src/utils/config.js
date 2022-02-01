@@ -1,7 +1,7 @@
 module.exports = {
   metadata: {
     name: process.env.SERVICE_NAME,
-    podId: process.env.K8S_POD_ID,
+    podName: process.env.POD_NAME,
   },
   burningResource: {
     responseTime: parseInt(process.env.RESPONSE_TIME) || 140,

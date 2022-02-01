@@ -10,7 +10,7 @@ const metrics = require('./utils/metrics');
 const requestCounter = new Counter({
   name: 'app_request_count_total',
   help: 'Total number of requests.',
-  labelNames: ['pod_id', 'endpoint', 'service'],
+  labelNames: ['pod_name', 'endpoint', 'service'],
 });
 
 const consumer = consumeResources(
@@ -27,7 +27,7 @@ const main = async () => {
   app.use((req, _res, next) => {
     requestCounter.inc({
       service: config.metadata.name,
-      pod_id: config.metadata.podId,
+      pod_name: config.metadata.podName,
       endpoint: req.path,
     });
 
