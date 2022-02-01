@@ -5,6 +5,8 @@ metadata:
   name: greeting-service-config
 data:
   PORT: '4000'
+  RESPONSE_TIME: '400'
+  FAILURE_RATE: '2'
 
 ---
 apiVersion: v1
@@ -46,8 +48,19 @@ spec:
     spec:
       containers:
         - name: greeting-service
-          image: martinnirtl/demos.general.greeting-service:0.2.0-alpha
-          resources: {}
+          image: martinnirtl/demos.general.greeting-service:0.4.0
+          resources:
+            requests:
+              memory: "160Mi"
+              cpu: "600m"
+            limits:
+              memory: "200Mi"
+              cpu: "800m"
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
           envFrom:
             - configMapRef:
                 name: greeting-service-config
