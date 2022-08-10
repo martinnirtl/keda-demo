@@ -55,7 +55,7 @@ class ResourcesConsumer {
     var res = 0;
     for (var i = 0; i < effort; i++) {
       for (var j = 0; j < effort; j++) {
-        res = i * i;
+        res = i * i + 1;
       }
     }
 
