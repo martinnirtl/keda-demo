@@ -44,7 +44,7 @@ const main = async () => {
     }
 
     try {
-      consumer.consume();
+      consumer.consume(config.burningResource.effort);
     } catch (error) {
       logger.error('unexpected error occured');
 

@@ -37,7 +37,7 @@ class ResourcesConsumer {
     );
   }
 
-  blockCPU(time = this.responseTime) {
+  blockCPUByTime(time = this.responseTime) {
     const now = new Date().getTime();
     const v = Math.random() * 40;
 
@@ -51,8 +51,25 @@ class ResourcesConsumer {
     }
   }
 
-  consume(computingTime = this.responseTime, errorOverhead = 0) {
-    this.blockCPU(computingTime + errorOverhead);
+  blockCPUByEffort(effort = this.effort) {
+    var res = 0;
+    for (var i = 0; i < effort; i++) {
+      res = i + i;
+    }
+
+    if (res == 0) {
+      console.log('common! let me do some work!');
+    }
+
+    return;
+  }
+
+  consume(effort, computingTime = this.responseTime, errorOverhead = 0) {
+    if (effort > 0) {
+      this.blockCPUByEffort(effort);
+    } else {
+      this.blockCPUByTime(computingTime + errorOverhead);
+    }
 
     const throwError = this.failureRateHelper[this.requestCounter];
 
