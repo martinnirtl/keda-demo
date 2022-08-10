@@ -54,7 +54,9 @@ class ResourcesConsumer {
   blockCPUByEffort(effort = this.effort) {
     var res = 0;
     for (var i = 0; i < effort; i++) {
-      res = i * i;
+      for (var j = 0; j < effort; j++) {
+        res = i * i;
+      }
     }
 
     if (res == 0) {
