@@ -1,15 +1,21 @@
 class ResourcesConsumer {
   responseTime;
+  cpuRatio;
+  cpuTime;
   failureRate;
+  failureOverhead;
   memoryLeak;
 
   data = [];
   requestCounter = 0;
   failureRateHelper = [];
 
-  constructor(responseTime = 140, failureRate = 0, memoryLeak = false) {
+  constructor(responseTime = 100, cpuRatio = 20, failureRate = 0, failureOverhead = 0, memoryLeak = false) {
     this.responseTime = responseTime;
+    this.cpuRatio = cpuRatio;
+    this.cpuTime = Math.round((responseTime * cpuRatio) / 100);
     this.failureRate = failureRate;
+    this.failureOverhead = failureOverhead;
     this.memoryLeak = memoryLeak;
 
     this.failureRateHelper = Array.from(
@@ -37,9 +43,9 @@ class ResourcesConsumer {
     );
   }
 
-  blockCPUByTime(time = this.responseTime) {
+  blockCPUByTime(time = 0) {
     const now = new Date().getTime();
-    const v = Math.random() * 40;
+    const v = Math.random() * 10;
 
     const calculations = this.memoryLeak ? this.data : [];
     for (;;) {
@@ -51,27 +57,15 @@ class ResourcesConsumer {
     }
   }
 
-  blockCPUByEffort(effort = this.effort) {
-    var res = 0;
-    for (var i = 0; i < effort; i++) {
-      for (var j = 0; j < effort; j++) {
-        res = i * i + 1;
-      }
-    }
-
-    if (res == 0) {
-      console.log('common! let me do some work!');
-    }
+  async doAsyncWork(time = 0) {
+    await new Promise(resolve => setTimeout(resolve, time));
 
     return;
   }
 
-  consume(effort, computingTime = this.responseTime, errorOverhead = 0) {
-    if (effort > 0) {
-      this.blockCPUByEffort(effort);
-    } else {
-      this.blockCPUByTime(computingTime + errorOverhead);
-    }
+  async consume() {
+    this.blockCPUByTime(this.cpuTime);
+    await this.doAsyncWork(this.responseTime - this.cpuTime);
 
     const throwError = this.failureRateHelper[this.requestCounter];
 
@@ -81,11 +75,13 @@ class ResourcesConsumer {
     }
 
     if (throwError) {
+      this.blockCPUByTime(this.failureOverhead);
+
       throw new Error();
     }
   }
 }
 
-exports.consumeResources = (responseTime, failureRate, memoryLeak) => {
-  return new ResourcesConsumer(responseTime, failureRate, memoryLeak);
+exports.consumeResources = (responseTime, cpuRatio, failureRate, failureOverhead, memoryLeak) => {
+  return new ResourcesConsumer(responseTime, cpuRatio, failureRate, failureOverhead, memoryLeak);
 };

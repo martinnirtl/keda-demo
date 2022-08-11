@@ -15,7 +15,9 @@ const requestCounter = new Counter({
 
 const consumer = consumeResources(
   config.burningResource.responseTime,
+  config.burningResource.cpuRatio,
   config.burningResource.failureRate,
+  config.burningResource.failureOverhead,
   config.burningResource.memoryLeak,
 );
 
@@ -36,7 +38,7 @@ const main = async () => {
 
   app.get('/metrics', metrics);
 
-  app.get('/hello/:name', (req, res) => {
+  app.get('/hello/:name', async (req, res) => {
     const name = req.params.name;
 
     if (!name) {
@@ -44,7 +46,7 @@ const main = async () => {
     }
 
     try {
-      consumer.consume(config.burningResource.effort);
+      await consumer.consume();
     } catch (error) {
       logger.error('unexpected error occured');
 
