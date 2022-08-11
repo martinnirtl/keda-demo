@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: loadtest-config
+  name: static-load
 data:
   script.js: |
     import http from 'k6/http';
@@ -14,7 +14,7 @@ data:
     }
 
 ---
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: loadtest-static
@@ -30,7 +30,7 @@ spec:
             imagePullPolicy: IfNotPresent
             args:
             - run
-            - "--vus=10"
+            - "--vus=5"
             - "--duration=1m"
             - script.js
             env:
@@ -43,10 +43,10 @@ spec:
           volumes:
             - name: config
               configMap:
-                name: loadtest-config
+                name: static-load
 
 ---
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: loadtest-hourly-burst
@@ -75,10 +75,10 @@ spec:
           volumes:
             - name: config
               configMap:
-                name: loadtest-config
+                name: static-load
 
 ---
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: loadtest-daily-burst
@@ -107,4 +107,4 @@ spec:
           volumes:
             - name: config
               configMap:
-                name: loadtest-config
+                name: static-load

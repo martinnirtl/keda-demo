@@ -1,0 +1,62 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dynamic-load
+data:
+  script.js: |
+    import http from 'k6/http';
+    import { sleep } from 'k6';
+
+    export const options = {
+      stages: [
+        { duration: '5m', target: 10 },
+        { duration: '5m', target: 10 },
+        { duration: '5m', target: 20 },
+        { duration: '5m', target: 20 },
+        { duration: '5m', target: 30 },
+        { duration: '5m', target: 30 },
+        { duration: '5m', target: 40 },
+        { duration: '5m', target: 40 },
+        { duration: '5m', target: 50 },
+        { duration: '5m', target: 50 },
+        { duration: '5m', target: 60 },
+        { duration: '5m', target: 60 },
+        { duration: '5m', target: 70 },
+        { duration: '5m', target: 70 },
+        { duration: '5m', target: 80 },
+        { duration: '5m', target: 80 },
+      ],
+    };
+
+    export default function () {
+      http.get(__ENV.GREETING_SERVICE_BASEURL + '/hello/martin');
+      sleep(1);
+    };
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: loadgen-loadtest
+spec:
+  template:
+      spec:
+        containers:
+        - name: k6
+          image: loadimpact/k6
+          imagePullPolicy: IfNotPresent
+          args:
+          - run
+          - script.js
+          env:
+          - name: GREETING_SERVICE_BASEURL
+            value: http://greeting-service:4000
+          volumeMounts:
+            - mountPath: /home/k6
+              name: config
+        restartPolicy: OnFailure
+        volumes:
+          - name: config
+            configMap:
+              name: dynamic-load
