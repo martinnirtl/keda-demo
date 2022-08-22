@@ -18,10 +18,9 @@ data:
 
     export const options = {
       stages: [
-        { duration: '20m', target: 4 },
-        { duration: '20m', target: 4 },
-        { duration: '10m', target: 8 },
-        { duration: '10m', target: 8 },
+        { duration: '20m', target: 10 },
+        { duration: '20m', target: 10 },
+        { duration: '10m', target: 12 },
         { duration: '10m', target: 0 },
       ],
     };
@@ -69,7 +68,7 @@ kind: CronJob
 metadata:
   name: load-daily
 spec:
-  schedule: "0 6 * * 1-5"
+  schedule: "0 */2 * * *"
   jobTemplate:
     spec:
       template:
